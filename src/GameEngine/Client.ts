@@ -2,7 +2,7 @@ import Entity from './Entity'
 import LagNetwork from './LagNetwork'
 import Server from './Server'
 
-import { InputMessage, WorldStateMessage, Command, TimestampedShareableData } from "./helper/helper";
+import { InputMessage, WorldStateMessage, Command, TimestampedShareableData, CommandData } from "./helper/helper";
 // =============================================================================
 //  The Client.
 // =============================================================================
@@ -111,21 +111,22 @@ export default class Client {
         this.lastTs = nowTs;
 
         // Gather players input data
-        var commands: Command[] = []
+        var commands: CommandData[] = []
         var pressedTime = dtSec;
         var entityId = this.entityId;
 
 
         if (this.keyRight) {
-            commands.push(Command.goRight)
+            commands.push(new CommandData(Command.goRight))
         } else if (this.keyLeft) {
-            commands.push(Command.goLeft)
+            commands.push(new CommandData(Command.goLeft))
         }
 
         if (this.keyUp) {
-            commands.push(Command.goUp)
+            commands.push(new CommandData(Command.goUp))
         } else if (this.keyDown) {
-            commands.push(Command.goDown)
+            commands.push(new CommandData(Command.goDown))
+        }
         }
 
         if (commands.length == 0) {

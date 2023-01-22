@@ -39,16 +39,16 @@ export default class Entity {
 
     // Apply user's input to this entity.
     applyInput(input: InputMessage) {
-        if (input.commands.indexOf(Command.goRight) >= 0)
+        if (input.commands.findIndex(c => c.command ==Command.goRight) >= 0)
             this.x += input.pressedTime * this.speed;
 
-        if (input.commands.indexOf(Command.goLeft) >= 0)
+        if (input.commands.findIndex(c => c.command == Command.goLeft) >= 0)
             this.x += input.pressedTime * -this.speed;
 
-        if (input.commands.indexOf(Command.goUp) >= 0)
+        if (input.commands.findIndex(c => c.command == Command.goUp) >= 0)
             this.y += input.pressedTime * -this.speed;
 
-        if (input.commands.indexOf(Command.goDown) >= 0)
+        if (input.commands.findIndex(c => c.command == Command.goDown) >= 0)
             this.y += input.pressedTime * this.speed;
     }
 }

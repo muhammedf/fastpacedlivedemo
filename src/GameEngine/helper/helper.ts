@@ -21,6 +21,15 @@ export class MessageContainer {
     }
 }
 
+export class CommandData{
+    command: Command
+    param: any
+    constructor(command:Command, param: any = null){
+        this.command=command
+        this.param = param
+    }
+}
+
 export enum Command {
     goUp,
     goDown,
@@ -29,14 +38,14 @@ export enum Command {
 }
 
 export class InputMessage extends Message {
-    commands: Command[]
+    commands: CommandData[]
     entityId :number
     pressedTime  :number
     inputSequenceNumber :number
     constructor(entityId: number, 
         pressedTime: number, 
         inputSequenceNumber: number,
-        commands: Command[]) {
+        commands: CommandData[]) {
         super()
         this.entityId = entityId
         this.pressedTime = pressedTime
