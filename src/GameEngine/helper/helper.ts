@@ -21,6 +21,15 @@ export class MessageContainer {
     }
 }
 
+export class Vector{
+    x: number
+    y: number
+    constructor(x:number,y:number){
+        this.x = x
+        this.y = y
+    }
+}
+
 export class CommandData{
     command: Command
     param: any
@@ -35,6 +44,7 @@ export enum Command {
     goDown,
     goLeft,
     goRight,
+    shoot
 }
 
 export class InputMessage extends Message {

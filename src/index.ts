@@ -32,6 +32,7 @@ var initializeWordRendering = (pixiApp: PIXI.Application, entities: { [key: numb
 
     // reset view stage
     var entityGraphics: PIXI.Graphics[] = []
+    var shotGraphics: PIXI.Graphics[] = []
     for (var i = pixiApp.stage.children.length - 1; i >= 0; i--) {
         pixiApp.stage.removeChild(pixiApp.stage.children[i]);
     }
@@ -50,10 +51,26 @@ var initializeWordRendering = (pixiApp: PIXI.Application, entities: { [key: numb
         entityGraphic.beginFill(colours[entity.entityId], 1);
         entityGraphic.drawCircle(0, 0, radius);
         entityGraphic.endFill();
+        
+        const stickwidth = 2;
+        const stickheight = 20;
+        
+        var shotGraphic = new PIXI.Graphics();
+        shotGraphic.beginFill(colours[entity.entityId], 1);
+        shotGraphic.drawRect(-stickwidth/2,-stickheight/2,stickwidth, stickheight);
+        shotGraphic.drawRect(-stickheight/2,-stickwidth/2,stickheight, stickwidth);
+        shotGraphic.endFill()
 
         entityGraphics.push(entityGraphic)
-        pixiApp.stage.addChild(entityGraphic);
+        shotGraphics.push(shotGraphic)
     }
+
+    entityGraphics.forEach(eg => {
+        pixiApp.stage.addChild(eg)
+    });
+    shotGraphics.forEach(sg => {
+        pixiApp.stage.addChild(sg)
+    });
 
     // update the entity representations using the entityGraphics
     // this is the drawloop 
@@ -62,6 +79,8 @@ var initializeWordRendering = (pixiApp: PIXI.Application, entities: { [key: numb
             const entity = entities[i];
             entityGraphics[i].x = entity.x
             entityGraphics[i].y = entity.y
+            shotGraphics[i].x = entity.shot_x
+            shotGraphics[i].y = entity.shot_y
         }
     });
 }
@@ -88,6 +107,13 @@ const keyHandler = (e: KeyboardEvent) => {
         e.preventDefault()
         player1.keyDown = (e.type == "keydown");
     }
+    if(e.key == ' '){
+        e.preventDefault()
+        if(!e.repeat && e.type == "keydown")
+            player1.shoot = true
+        else
+            player1.shoot = false
+    }
 
     if (e.key == 'ArrowRight' || e.key == 'Right') {
         e.preventDefault()
@@ -102,6 +128,13 @@ const keyHandler = (e: KeyboardEvent) => {
     } else if (e.key == 'ArrowDown' || e.key == 'Down') {
         e.preventDefault()
         player2.keyDown = (e.type == "keydown");
+    }
+    if(e.key == 'Enter'){
+        e.preventDefault()
+        if(!e.repeat && e.type == "keydown")
+            player2.shoot = true
+        else
+            player2.shoot = false
     }
 };
 document.body.onkeydown = keyHandler;

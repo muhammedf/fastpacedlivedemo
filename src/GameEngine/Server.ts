@@ -3,7 +3,7 @@ import Entity from './Entity'
 import LagNetwork from './LagNetwork'
 import Client from './Client'
 
-import { InputMessage, WorldStateMessage } from "./helper/helper";
+import { InputMessage, WorldStateMessage, Command, Vector } from "./helper/helper";
 
 // =============================================================================
 //  The Server.
@@ -115,6 +115,8 @@ export default class Server {
                 const id = message.entityId;
                 this.entities[id].applyInput(message);
 
+                this.headshotCheck(message)
+
                 // remember last input sequence number for client because?
                 this.lastProcessedInput[id] = message.inputSequenceNumber;
             }
@@ -127,6 +129,22 @@ export default class Server {
             info += `Player ${i}: #${this.lastProcessedInput[i] || 0}   `;
         }
         this.status.textContent = info;
+    }
+
+    headshotCheck(message: InputMessage){
+        const index = message.commands.findIndex(c => c.command == Command.shoot)
+        if(index >= 0){
+            const enemy = this.entities[1-message.entityId]
+            const target = message.commands[index].param as Vector
+            const distance = Math.sqrt(Math.pow(target.x - enemy.x,2)+Math.pow(target.y-enemy.y,2))
+
+            if (distance < 20){
+                console.log("%c HEADSHOT", "color: green", `Player ${message.entityId} -> Player ${enemy.entityId}`)
+            }
+            else{
+                console.log("%c MISSED", "color: red", `Player ${message.entityId} -> Player ${enemy.entityId}`)
+            }
+        }
     }
 
     // Send the world state to all the connected clients.

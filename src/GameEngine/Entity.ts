@@ -1,28 +1,37 @@
-import { InputMessage, TimestampedShareableData, Command } from "./helper/helper";
+import { InputMessage, TimestampedShareableData, Command, Vector } from "./helper/helper";
 
 // =============================================================================
 //  An Entity in the world.
 // =============================================================================
 export default class Entity {
-    shareableData = {
-        x: 0,
-        y: 0
+    shareableData = 
+    {
+        position: new Vector(0,0),
+        lastshot: new Vector(0,0)
     }
 
     get x(): number {
-        return this.shareableData.x;
+        return this.shareableData.position.x;
     }
 
     get y(): number {
-        return this.shareableData.y;
+        return this.shareableData.position.y;
     }
 
     set x(x: number) {
-        this.shareableData.x = x
+        this.shareableData.position.x = x
     }
 
     set y(y: number) {
-        this.shareableData.y = y
+        this.shareableData.position.y = y
+    }
+
+    get shot_x(): number {
+        return this.shareableData.lastshot.x
+    }
+
+    get shot_y(): number{
+        return this.shareableData.lastshot.y
     }
 
     speed = 50; // units/s
@@ -50,5 +59,10 @@ export default class Entity {
 
         if (input.commands.findIndex(c => c.command == Command.goDown) >= 0)
             this.y += input.pressedTime * this.speed;
+            
+        const index = input.commands.findIndex(c => c.command == Command.shoot)
+        if (index >= 0){
+            this.shareableData.lastshot = input.commands[index].param as Vector
+        }
     }
 }

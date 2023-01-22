@@ -2,7 +2,7 @@ import Entity from './Entity'
 import LagNetwork from './LagNetwork'
 import Server from './Server'
 
-import { InputMessage, WorldStateMessage, Command, TimestampedShareableData, CommandData } from "./helper/helper";
+import { InputMessage, WorldStateMessage, Command, TimestampedShareableData, CommandData, Vector } from "./helper/helper";
 // =============================================================================
 //  The Client.
 // =============================================================================
@@ -19,6 +19,7 @@ export default class Client {
     keyRight = false;
     keyUp = false;
     keyDown = false;
+    shoot = false;
 
     // Simulated network connection.
     network = new LagNetwork();
@@ -127,6 +128,11 @@ export default class Client {
         } else if (this.keyDown) {
             commands.push(new CommandData(Command.goDown))
         }
+
+        if (this.shoot){
+            this.shoot = false
+            let enemy = this.entities[1-entityId]
+            commands.push(new CommandData(Command.shoot, new Vector(enemy.x, enemy.y)))
         }
 
         if (commands.length == 0) {
