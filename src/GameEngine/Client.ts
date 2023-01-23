@@ -257,15 +257,15 @@ export default class Client {
                 && renderTimestamp <= buffer[1].timestamp) {
 
                 entity.x = this.interpolate(
-                    buffer[0].shareableData.x,
-                    buffer[1].shareableData.x,
+                    buffer[0].shareableData.position.x,
+                    buffer[1].shareableData.position.x,
                     buffer[0].timestamp,
                     buffer[1].timestamp,
                     renderTimestamp);
 
                 entity.y = this.interpolate(
-                    buffer[0].shareableData.y,
-                    buffer[1].shareableData.y,
+                    buffer[0].shareableData.position.y,
+                    buffer[1].shareableData.position.y,
                     buffer[0].timestamp,
                     buffer[1].timestamp,
                     renderTimestamp);
