@@ -21,20 +21,23 @@ export class MessageContainer {
     }
 }
 
-export class Vector{
+export class Vector implements Copyable<Vector> {
     x: number
     y: number
-    constructor(x:number,y:number){
+    constructor(x: number, y: number) {
         this.x = x
         this.y = y
     }
+    copy(): Vector {
+        return new Vector(this.x,this.y)
+    }
 }
 
-export class CommandData{
+export class CommandData {
     command: Command
     param: any
-    constructor(command:Command, param: any = null){
-        this.command=command
+    constructor(command: Command, param: any = null) {
+        this.command = command
         this.param = param
     }
 }
@@ -49,11 +52,11 @@ export enum Command {
 
 export class InputMessage extends Message {
     commands: CommandData[]
-    entityId :number
-    pressedTime  :number
-    inputSequenceNumber :number
-    constructor(entityId: number, 
-        pressedTime: number, 
+    entityId: number
+    pressedTime: number
+    inputSequenceNumber: number
+    constructor(entityId: number,
+        pressedTime: number,
         inputSequenceNumber: number,
         commands: CommandData[]) {
         super()
@@ -76,3 +79,7 @@ export class WorldStateMessage extends Message {
     }
 }
 
+export interface Copyable<T>
+{
+    copy():T
+}

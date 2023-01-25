@@ -1,19 +1,23 @@
 
-import Entity from './Entity'
+import Entity, { EntityState } from './Entity'
 import LagNetwork from './LagNetwork'
 import Client from './Client'
 
 import { InputMessage, WorldStateMessage, Command, Vector } from "./helper/helper";
+import History from './History';
 
 // =============================================================================
 //  The Server.
 // =============================================================================
+
+type HistoryDataType = EntityState
 
 export default class Server {
 
     // Connected clients and their entities.
     clients: Client[] = [];
     entities: Entity[] = [];
+    history: History<HistoryDataType> = new History<HistoryDataType>()
 
     // Last processed input for each client.
     lastProcessedInput: number[] = [];
@@ -22,6 +26,7 @@ export default class Server {
     network = new LagNetwork();
 
     updateRate = 0
+    updatePeriod = 0
     maxPressedTimeForValidation = 1 / 10
 
     pixiApp: PIXI.Application;
@@ -76,6 +81,8 @@ export default class Server {
         var self = this
 
         this.updateRate = hz;
+        this.updatePeriod = 1/hz
+        this.history.setTickRate(this.updateRate)
 
         clearInterval(this.updateIntervalId);
 
@@ -101,6 +108,8 @@ export default class Server {
 
     processInputs() {
         // Process all pending messages from clients.
+        this.history.nextTick()
+
         while (true) {
 
             const message = this.network.receive() as InputMessage;
@@ -114,7 +123,7 @@ export default class Server {
             if (this.validateInput(message)) {
                 const id = message.entityId;
                 this.entities[id].applyInput(message);
-
+                this.history.setRecord(id, this.entities[id].shareableData)
                 this.headshotCheck(message)
 
                 // remember last input sequence number for client because?
@@ -134,15 +143,25 @@ export default class Server {
     headshotCheck(message: InputMessage){
         const index = message.commands.findIndex(c => c.command == Command.shoot)
         if(index >= 0){
-            const enemy = this.entities[1-message.entityId]
+            const lag = this.clients[message.entityId].lag
+            const tick = Math.round(lag / this.updatePeriod / 1000)
+            console.log("tick", tick)
+            if(tick >= this.updateRate){
+                console.log("its too much")
+                return
+            }
+            const enemyRecord = this.history.getRecord(tick).getData(1-message.entityId)//this.entities[1-message.entityId]
+            if(enemyRecord == null)
+                return
+
             const target = message.commands[index].param as Vector
-            const distance = Math.sqrt(Math.pow(target.x - enemy.x,2)+Math.pow(target.y-enemy.y,2))
+            const distance = Math.sqrt(Math.pow(target.x - enemyRecord.position.x,2)+Math.pow(target.y-enemyRecord.position.y,2))
 
             if (distance < 20){
-                console.log("%c HEADSHOT", "color: green", `Player ${message.entityId} -> Player ${enemy.entityId}`)
+                console.log("%c HEADSHOT", "color: green", `Player ${message.entityId} -> Player ${1-message.entityId}`)
             }
             else{
-                console.log("%c MISSED", "color: red", `Player ${message.entityId} -> Player ${enemy.entityId}`)
+                console.log("%c MISSED", "color: red", `Player ${message.entityId} -> Player ${1-message.entityId}`)
             }
         }
     }

@@ -1,14 +1,10 @@
-import { InputMessage, TimestampedShareableData, Command, Vector } from "./helper/helper";
+import { InputMessage, TimestampedShareableData, Command, Vector, Copyable } from "./helper/helper";
 
 // =============================================================================
 //  An Entity in the world.
 // =============================================================================
 export default class Entity {
-    shareableData = 
-    {
-        position: new Vector(0,0),
-        lastshot: new Vector(0,0)
-    }
+    shareableData: EntityState = new EntityState(new Vector(0,0), new Vector(0,0))
 
     get x(): number {
         return this.shareableData.position.x;
@@ -62,7 +58,20 @@ export default class Entity {
             
         const index = input.commands.findIndex(c => c.command == Command.shoot)
         if (index >= 0){
-            this.shareableData.lastshot = input.commands[index].param as Vector
+            this.shareableData.lastshot.x = input.commands[index].param.x
+            this.shareableData.lastshot.y = input.commands[index].param.y
         }
+    }
+}
+
+export class EntityState implements Copyable<EntityState>{
+    position: Vector
+    lastshot: Vector
+    constructor(position: Vector, lastshot: Vector){
+        this.position = position
+        this.lastshot = lastshot
+    }
+    copy(): EntityState {
+        return new EntityState(this.position.copy(), this.lastshot.copy())
     }
 }
